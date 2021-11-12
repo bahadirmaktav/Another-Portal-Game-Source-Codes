@@ -23,21 +23,18 @@ public class CharacterMovementController : CharacterPhysicsController
     protected override void MovementInputControl()
     {
         tempVelocityAxisValue = Input.GetAxis("Horizontal") * speed;
-        if (gravityDirectionModifier == Vector2.down) { velocity.x = tempVelocityAxisValue; }
-        else if (gravityDirectionModifier == Vector2.left) { velocity.y = tempVelocityAxisValue; }
-        else if (gravityDirectionModifier == Vector2.right) { velocity.y = tempVelocityAxisValue; }
-        else { velocity.x = tempVelocityAxisValue; }
+        if (isGravityVer) { velocity.x = tempVelocityAxisValue; }
+        else { velocity.y = tempVelocityAxisValue; }
 
-        bool flipSprite = (spriteRenderer.flipX ? ((gravityDirectionModifier.x != 0) ? velocity.y > 0.1f : (velocity.x > 0.1f)) : ((gravityDirectionModifier.x != 0) ? (velocity.y < -0.1f) :(velocity.x < -0.1f)));
+        bool flipSprite = (spriteRenderer.flipX ? ((!isGravityVer) ? velocity.y > 0.1f : (velocity.x > 0.1f)) : ((!isGravityVer) ? (velocity.y < -0.1f) : (velocity.x < -0.1f)));
         if (flipSprite) { spriteRenderer.flipX = !spriteRenderer.flipX; }
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            if (gravityDirectionModifier == Vector2.down) { velocity.y = jumpOffSpeed; }
-            else if (gravityDirectionModifier == Vector2.left) { velocity.x = jumpOffSpeed; }
-            else if (gravityDirectionModifier == Vector2.right) { velocity.x = -jumpOffSpeed; }
-            else { velocity.y = -jumpOffSpeed; }
-            platformNormal = (gravityDirectionModifier.x != 0) ? Vector2.right : Vector2.up;
+            if (isGravityVer) { velocity.y = gravityDirCorrecter * jumpOffSpeed; }
+            else { velocity.x = gravityDirCorrecter * jumpOffSpeed; }
+
+            platformNormal = ((isGravityVer) ? Vector2.up : Vector2.right) * gravityDirCorrecter;
         }
     }
 }

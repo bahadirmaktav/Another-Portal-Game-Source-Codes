@@ -1,18 +1,4 @@
-﻿/* 
-                    2D Platformer Character Physics Controller
-    --------------------------------------------------------------------------------------
-    Can Do:    
-                Horizontal movement
-                Vertical movement
-                Gravitiy control
-                Movement on slopes with spesific angle range
-    --------------------------------------------------------------------------------------
-    Cant Do:    
-                Cant falling on the slopes outside the angle range
-                Some speed up when hit slopes under it (Not looking like an error.)
-*/
-
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +14,8 @@ public class CharacterPhysicsController : MonoBehaviour
     [Header("Physics Control Parameters")]
     protected Vector2 velocity;
     protected Vector2 platformNormal;
+    protected float gravityDirCorrecter = 1f;
+    protected bool isGravityVer = true;
 
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
@@ -52,13 +40,15 @@ public class CharacterPhysicsController : MonoBehaviour
     {
         isGrounded = false;
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
+        isGravityVer = (gravityDirectionModifier.x != 0) ? false : true;
+        gravityDirCorrecter = (gravityDirectionModifier.x + gravityDirectionModifier.y == -1) ? 1 : -1;
         Vector2 deltaPosition = velocity * Time.deltaTime;
-        Vector2 platformParallel = new Vector2(platformNormal.y, -platformNormal.x);
+        Vector2 platformParallel = new Vector2(platformNormal.y, -platformNormal.x) * gravityDirCorrecter;
 
-        Vector2 deltaMovement = deltaPosition.x * platformParallel;
-        MovementPhysicsControl(deltaMovement, false);
-        deltaMovement = deltaPosition.y * Vector2.up;
-        MovementPhysicsControl(deltaMovement, true);
+        Vector2 deltaMovement = VectorAxisForMovementDir(deltaPosition) * platformParallel;
+        MovementPhysicsControl(deltaMovement, false, isGravityVer, gravityDirCorrecter);
+        deltaMovement = VectorAxisForGravityDir(deltaPosition) * ((isGravityVer) ? Vector2.up : Vector2.right);
+        MovementPhysicsControl(deltaMovement, true, isGravityVer, gravityDirCorrecter);
     }
 
     void Update()
@@ -66,9 +56,12 @@ public class CharacterPhysicsController : MonoBehaviour
         MovementInputControl();
     }
 
+    protected float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
+    protected float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
+
     protected virtual void MovementInputControl() { }
 
-    protected void MovementPhysicsControl(Vector2 deltaMovement, bool isVerticalMovementControlOn)
+    protected void MovementPhysicsControl(Vector2 deltaMovement, bool isGravityAxisMovementControlOn, bool isGravityVer, float gravityDirCorrecter)
     {
         float moveDistance = deltaMovement.magnitude;
         if (moveDistance > minMovementDistance)
@@ -78,13 +71,13 @@ public class CharacterPhysicsController : MonoBehaviour
             if (htiBuffer[0].collider != null)
             {
                 Vector2 currentPlatformNormal = htiBuffer[0].normal;
-                if (currentPlatformNormal.y > Mathf.Sin(maxPlatformAngleToMakeGrounded))
+                if (VectorAxisForGravityDir(currentPlatformNormal) * gravityDirCorrecter > Mathf.Sin(maxPlatformAngleToMakeGrounded))
                 {
                     isGrounded = true;
-                    if (isVerticalMovementControlOn)
+                    if (isGravityAxisMovementControlOn)
                     {
                         platformNormal = currentPlatformNormal;
-                        currentPlatformNormal.x = 0;
+                        if (isGravityVer) { currentPlatformNormal.x = 0; } else { currentPlatformNormal.y = 0; }
                     }
                 }
                 float projection = Vector2.Dot(velocity, currentPlatformNormal);
