@@ -49,8 +49,6 @@ public class PortalController : MonoBehaviour
                 Vector3 clonedPortalPosition = new Vector3(mousePosV2.x + (closestHitNormal.x * -closestHitDistance), mousePosV2.y + (closestHitNormal.y * -closestHitDistance), 0);
                 Quaternion clonedPortalRotation = (Mathf.Abs(closestHitNormal.x) - 0.1f < 0) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 90);
                 Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
-                Debug.Log(smallestHitIndex);
-
             }
         }
     }
