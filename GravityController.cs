@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GravityController : MonoBehaviour
 {
+    [Header("Initializations")]
     protected CharacterMovementController characterMovementController;
 
     void Awake()
