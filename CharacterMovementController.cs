@@ -9,18 +9,18 @@ public class CharacterMovementController : CharacterPhysicsController
     [SerializeField] private float jumpOffSpeed = 6f;
 
     [Header("Initializations")]
-    public SpriteRenderer spriteRenderer;
+    protected SpriteRenderer spriteRenderer;
 
     [Header("Control Paramaters")]
     protected bool isCharacterLookDirectionRight = true;
     protected float tempVelocityAxisValue;
 
-    void Awake()
+    protected void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    protected override void MovementInputControl()
+    protected void MovementInputControl()
     {
         tempVelocityAxisValue = Input.GetAxis("Horizontal") * speed;
         if (isGravityVer) { velocity.x = tempVelocityAxisValue; }

@@ -5,17 +5,17 @@ using UnityEngine;
 public class CharacterPhysicsController : MonoBehaviour
 {
     [Header("Physics Input Paramaters")]
-    [SerializeField] private float minPlatformDistance = 0.01f;
-    [SerializeField] private float minMovementDistance = 0.001f;
     [SerializeField] private float gravityConstantModifier = 1f;
     [SerializeField] private float maxPlatformAngleToMakeGrounded = 45;
-    public Vector2 gravityDirectionModifier = new Vector2(0, -1);
+    [SerializeField] private float minPlatformDistance = 0.01f;
+    private float minMovementDistance = 0.001f;
 
     [Header("Physics Control Parameters")]
     protected Vector2 velocity;
     protected Vector2 platformNormal;
     protected float gravityDirCorrecter = 1f;
     protected bool isGravityVer = true;
+    protected Vector2 gravityDirectionModifier = new Vector2(0, -1);
 
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
@@ -24,19 +24,19 @@ public class CharacterPhysicsController : MonoBehaviour
     [Header("Status Flags")]
     [SerializeField] protected bool isGrounded = false;
 
-    void OnEnable()
+    protected void OnEnable()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Start()
+    protected void Start()
     {
         contactFilter.useTriggers = false;
         contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
         contactFilter.useLayerMask = true;
     }
 
-    void FixedUpdate()
+    protected void FixedUpdate()
     {
         isGrounded = false;
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
@@ -51,15 +51,10 @@ public class CharacterPhysicsController : MonoBehaviour
         MovementPhysicsControl(deltaMovement, true, isGravityVer, gravityDirCorrecter);
     }
 
-    void Update()
-    {
-        MovementInputControl();
-    }
+    protected virtual void Update() { }
 
     protected float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
     protected float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
-
-    protected virtual void MovementInputControl() { }
 
     protected void MovementPhysicsControl(Vector2 deltaMovement, bool isGravityAxisMovementControlOn, bool isGravityVer, float gravityDirCorrecter)
     {
