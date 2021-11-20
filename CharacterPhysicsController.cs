@@ -9,20 +9,19 @@ public class CharacterPhysicsController : MonoBehaviour
     [SerializeField] private float maxPlatformAngleToMakeGrounded = 45;
     [SerializeField] private float minPlatformDistance = 0.01f;
     private float minMovementDistance = 0.001f;
+    private float minConstToBeNotGrounded = 3f;
 
     [Header("Physics Control Parameters")]
+    public bool isGravityVer = true;
     protected Vector2 velocity;
     protected Vector2 platformNormal;
-    protected float gravityDirCorrecter = 1f;
-    protected bool isGravityVer = true;
     protected Vector2 gravityDirectionModifier = new Vector2(0, -1);
-
+    protected float gravityDirCorrecter = 1f;
+    protected bool isGrounded = false;
+    
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
     protected Rigidbody2D rb;
-
-    [Header("Status Flags")]
-    [SerializeField] protected bool isGrounded = false;
 
     protected void OnEnable()
     {
@@ -38,8 +37,9 @@ public class CharacterPhysicsController : MonoBehaviour
 
     protected void FixedUpdate()
     {
-        isGrounded = false;
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
+        isGrounded = (Mathf.Abs(VectorAxisForGravityDir(velocity)) > minConstToBeNotGrounded * gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime) ? false : isGrounded;
+        platformNormal = (!isGrounded) ? Vector2.zero : platformNormal;
         isGravityVer = (gravityDirectionModifier.x != 0) ? false : true;
         gravityDirCorrecter = (gravityDirectionModifier.x + gravityDirectionModifier.y == -1) ? 1 : -1;
         Vector2 deltaPosition = velocity * Time.deltaTime;
@@ -66,19 +66,15 @@ public class CharacterPhysicsController : MonoBehaviour
             if (htiBuffer[0].collider != null)
             {
                 Vector2 currentPlatformNormal = htiBuffer[0].normal;
-                if (VectorAxisForGravityDir(currentPlatformNormal) * gravityDirCorrecter > Mathf.Sin(maxPlatformAngleToMakeGrounded))
+                if (isGravityAxisMovementControlOn && VectorAxisForGravityDir(currentPlatformNormal) * gravityDirCorrecter > Mathf.Sin(maxPlatformAngleToMakeGrounded))
                 {
                     isGrounded = true;
-                    if (isGravityAxisMovementControlOn)
-                    {
-                        platformNormal = currentPlatformNormal;
-                        if (isGravityVer) { currentPlatformNormal.x = 0; } else { currentPlatformNormal.y = 0; }
-                    }
+                    platformNormal = currentPlatformNormal;
+                    if (isGravityVer) { currentPlatformNormal.x = 0; } else { currentPlatformNormal.y = 0; }
                 }
                 float projection = Vector2.Dot(velocity, currentPlatformNormal);
                 if (projection < 0) { velocity -= projection * currentPlatformNormal; }
                 deltaMovement = (moveDistance > htiBuffer[0].distance - minPlatformDistance) ? (htiBuffer[0].distance - minPlatformDistance) * deltaMovement.normalized : deltaMovement;
-
             }
         }
         rb.position = rb.position + deltaMovement;
