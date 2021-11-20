@@ -8,28 +8,25 @@ public class CharacterAIMovementController : MonoBehaviour
     [Header("Initializations")]
     protected Seeker seeker;
     protected Rigidbody2D rb;
-    protected Transform destination;
-    protected CharacterGravityController characterGravityController;
+    protected CharacterMovementController characterMovementController;
 
     [Header("Path Input Parameters")]
-    [SerializeField] private float minDistanceToReachToDes = 0.5f;
-    [SerializeField] private float minJumpDistanceToCancelMov = 2f;
+    [SerializeField] private float minDistanceToReachToDes = 0.7f;
+    [SerializeField] private float minJumpDistanceToCancelMov = 1f;
 
     [Header("Path Control Paramaters")]
     protected Path path;
-    protected int currentWaypoint = 0;
-    protected bool reachedEndOfPath = false;
-    protected Vector2 characterBottomPos;
-    protected Vector2 destinationPos;
+    protected Vector2 characterPos;
     protected float gravityAxisCharacter;
     protected bool isGravityVer;
-    [SerializeField] protected bool canCharacterMoveToDes = true;
-    public float movDirConstant;
+    protected bool canCharacterMoveToDes = true;
+    [HideInInspector] public float movDirConstant;
+    [HideInInspector] public Vector2 destinationPos;
+    [HideInInspector] public bool activatePathFinder = false;
 
     void Start()
     {
-        destination = GameObject.Find("Destination").transform;
-        characterGravityController = GetComponent<CharacterGravityController>();
+        characterMovementController = GetComponent<CharacterMovementController>();
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
 
@@ -38,13 +35,15 @@ public class CharacterAIMovementController : MonoBehaviour
 
     void MovementWithPath()
     {
-        canCharacterMoveToDes = true;
-        movDirConstant = 0;
-        characterBottomPos = rb.position;
-        destinationPos = destination.position;
-        isGravityVer = characterGravityController.isGravityVer;
-        gravityAxisCharacter = (isGravityVer) ? rb.position.y : rb.position.x;
-        seeker.StartPath(rb.position, destination.position, OnPathComplete);
+        if (activatePathFinder)
+        {
+            canCharacterMoveToDes = true;
+            movDirConstant = 0;
+            characterPos = rb.position;
+            isGravityVer = characterMovementController.isGravityVer;
+            gravityAxisCharacter = (isGravityVer) ? rb.position.y : rb.position.x;
+            seeker.StartPath(rb.position, destinationPos, OnPathComplete);
+        }
     }
 
     void OnPathComplete(Path p)
@@ -52,7 +51,6 @@ public class CharacterAIMovementController : MonoBehaviour
         if (!p.error)
         {
             path = p;
-            currentWaypoint = 0;
             PathMovementAvailabilityCheck();
             CharacterPathMovementControl();
         }
@@ -63,7 +61,7 @@ public class CharacterAIMovementController : MonoBehaviour
         for (int i = 0; i < path.vectorPath.Count; i++)
         {
             float gravityAxisWayPoint = (isGravityVer) ? path.vectorPath[i].y : path.vectorPath[i].x;
-            if (gravityAxisWayPoint - gravityAxisCharacter > minJumpDistanceToCancelMov)
+            if ((gravityAxisWayPoint - gravityAxisCharacter) * characterMovementController.gravityDirCorrecter > minJumpDistanceToCancelMov)
             {
                 canCharacterMoveToDes = false;
                 break;
@@ -73,12 +71,17 @@ public class CharacterAIMovementController : MonoBehaviour
 
     void CharacterPathMovementControl()
     {
-        if (canCharacterMoveToDes && (characterBottomPos - destinationPos).magnitude > minDistanceToReachToDes)
+        if (canCharacterMoveToDes && (characterPos - destinationPos).magnitude > minDistanceToReachToDes)
         {
-            Vector2 firstPathPoint = path.vectorPath[1];
-            Vector2 firstPathVec = firstPathPoint - characterBottomPos;
+            Vector2 firstPathPoint = (path.vectorPath[1] != null) ? path.vectorPath[1] : path.vectorPath[0];
+            Vector2 firstPathVec = firstPathPoint - characterPos;
             movDirConstant = (isGravityVer) ? (Vector2.Dot(firstPathVec, Vector2.right) > 0) ? 1f : -1f
                 : (Vector2.Dot(firstPathVec, Vector2.up) > 0) ? -1f : 1f;
+        }
+        else
+        {
+            movDirConstant = 0;
+            activatePathFinder = false;
         }
     }
 }

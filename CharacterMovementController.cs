@@ -22,7 +22,7 @@ public class CharacterMovementController : CharacterPhysicsController
         characterAIMovementController = GetComponent<CharacterAIMovementController>();
     }
 
-    protected void MovementInputControl()
+    protected override void MovementInputControl()
     {
         tempVelocityAxisValue = characterAIMovementController.movDirConstant * speed;
         if (isGravityVer) { velocity.x = tempVelocityAxisValue; }

@@ -12,13 +12,13 @@ public class CharacterPhysicsController : MonoBehaviour
     private float minConstToBeNotGrounded = 3f;
 
     [Header("Physics Control Parameters")]
-    public bool isGravityVer = true;
+    [HideInInspector] public bool isGravityVer = true;
+    [HideInInspector] public float gravityDirCorrecter = 1f;
+    [HideInInspector] public Vector2 gravityDirectionModifier = new Vector2(0, -1);
+    [HideInInspector] public Vector2 platformNormal;
     protected Vector2 velocity;
-    protected Vector2 platformNormal;
-    protected Vector2 gravityDirectionModifier = new Vector2(0, -1);
-    protected float gravityDirCorrecter = 1f;
     protected bool isGrounded = false;
-    
+
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
     protected Rigidbody2D rb;
@@ -51,7 +51,12 @@ public class CharacterPhysicsController : MonoBehaviour
         MovementPhysicsControl(deltaMovement, true, isGravityVer, gravityDirCorrecter);
     }
 
-    protected virtual void Update() { }
+    protected void Update()
+    {
+        MovementInputControl();
+    }
+
+    protected virtual void MovementInputControl() {}
 
     protected float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
     protected float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
