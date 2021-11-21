@@ -23,6 +23,7 @@ public class CharacterAIMovementController : MonoBehaviour
     [HideInInspector] public float movDirConstant;
     [HideInInspector] public Vector2 destinationPos;
     [HideInInspector] public bool activatePathFinder = false;
+    [HideInInspector] public bool activatePathFinderIsGrounded = true;
 
     void Start()
     {
@@ -35,7 +36,7 @@ public class CharacterAIMovementController : MonoBehaviour
 
     void MovementWithPath()
     {
-        if (activatePathFinder)
+        if (activatePathFinder && activatePathFinderIsGrounded)
         {
             canCharacterMoveToDes = true;
             movDirConstant = 0;

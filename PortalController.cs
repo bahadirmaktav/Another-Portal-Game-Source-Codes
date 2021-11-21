@@ -4,22 +4,23 @@ using UnityEngine;
 
 public class PortalController : MonoBehaviour
 {
+    [Header("Portal Input Paramaters")]
+
     [Header("Initializations")]
-    protected CharacterMovementController characterMovementController;
     protected CharacterAIMovementController characterAIMovementController;
+    protected CompositeCollider2D midGroundColl;
     public GameObject portalPrefab;
 
     [Header("Portal Control Parameters")]
-    protected int layerMaskOnlyMidground = 1 << 10;
+    protected int layerMaskOnlyPortalPlacePlatform = 1 << 13;
     protected int activePortalCount = 0;
     protected GameObject inPortal;
     protected GameObject outPortal;
-    public Vector2 outPortalGravityDir;
+    [HideInInspector] public Vector2 outPortalGravityDir;
 
     void Awake()
     {
-        characterMovementController = GameObject.Find("Character").GetComponent<CharacterMovementController>();
-        characterAIMovementController = GameObject.Find("Character").GetComponent<CharacterAIMovementController>();
+        midGroundColl = GameObject.Find("TilemapMidground").GetComponent<CompositeCollider2D>();
     }
 
     void Update()
@@ -33,10 +34,10 @@ public class PortalController : MonoBehaviour
 
             RaycastHit2D[] hit4Dir = new RaycastHit2D[4];
             float[] hit4DirDistances = new float[4];
-            hit4Dir[0] = Physics2D.Raycast(mousePosV2, Vector2.right, Mathf.Infinity, layerMaskOnlyMidground);
-            hit4Dir[1] = Physics2D.Raycast(mousePosV2, Vector2.left, Mathf.Infinity, layerMaskOnlyMidground);
-            hit4Dir[2] = Physics2D.Raycast(mousePosV2, Vector2.up, Mathf.Infinity, layerMaskOnlyMidground);
-            hit4Dir[3] = Physics2D.Raycast(mousePosV2, Vector2.down, Mathf.Infinity, layerMaskOnlyMidground);
+            hit4Dir[0] = Physics2D.Raycast(mousePosV2, Vector2.right, Mathf.Infinity, layerMaskOnlyPortalPlacePlatform);
+            hit4Dir[1] = Physics2D.Raycast(mousePosV2, Vector2.left, Mathf.Infinity, layerMaskOnlyPortalPlacePlatform);
+            hit4Dir[2] = Physics2D.Raycast(mousePosV2, Vector2.up, Mathf.Infinity, layerMaskOnlyPortalPlacePlatform);
+            hit4Dir[3] = Physics2D.Raycast(mousePosV2, Vector2.down, Mathf.Infinity, layerMaskOnlyPortalPlacePlatform);
             for (int i = 0; i < 4; i++) { hit4DirDistances[i] = (hit4Dir[i].collider != null) ? hit4Dir[i].distance : 100f; }
 
             int smallestHitIndex = 0;
@@ -47,13 +48,17 @@ public class PortalController : MonoBehaviour
                     smallestHitIndex = k;
                 }
             }
-            if (hit4DirDistances[smallestHitIndex] <= 0.5f)
+            if (hit4DirDistances[smallestHitIndex] <= 0.5f && !midGroundColl.OverlapPoint(mousePosV2))
             {
                 RaycastHit2D closestHit = hit4Dir[smallestHitIndex];
                 Vector2 closestHitNormal = hit4Dir[smallestHitIndex].normal;
                 float closestHitDistance = closestHit.distance;
                 Vector3 clonedPortalPosition = new Vector3(mousePosV2.x + (closestHitNormal.x * -closestHitDistance), mousePosV2.y + (closestHitNormal.y * -closestHitDistance), 0);
-                Quaternion clonedPortalRotation = (Mathf.Abs(closestHitNormal.x) - 0.1f < 0) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, 90);
+                Quaternion clonedPortalRotation;
+                if (smallestHitIndex == 0) { outPortalGravityDir = Vector2.left; clonedPortalRotation = Quaternion.Euler(0, 0, 90); }
+                else if (smallestHitIndex == 1) { outPortalGravityDir = Vector2.right; clonedPortalRotation = Quaternion.Euler(0, 0, -90); }
+                else if (smallestHitIndex == 2) { outPortalGravityDir = Vector2.down; clonedPortalRotation = Quaternion.Euler(0, 0, 180); }
+                else { outPortalGravityDir = Vector2.up; clonedPortalRotation = Quaternion.Euler(0, 0, 0); }
 
                 if (activePortalCount == 0)
                 {
@@ -65,11 +70,8 @@ public class PortalController : MonoBehaviour
                 {
                     outPortal = Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
                     outPortal.name = "OutPortal";
-                    if (smallestHitIndex == 0) { outPortalGravityDir = Vector2.left; }
-                    else if (smallestHitIndex == 1) { outPortalGravityDir = Vector2.right; }
-                    else if (smallestHitIndex == 2) { outPortalGravityDir = Vector2.down; }
-                    else { outPortalGravityDir = Vector2.up; }
                     activePortalCount++;
+                    characterAIMovementController = GameObject.FindGameObjectWithTag("Character").GetComponent<CharacterAIMovementController>();
                     characterAIMovementController.destinationPos = inPortal.transform.position;
                     characterAIMovementController.activatePathFinder = true;
                 }

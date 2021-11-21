@@ -8,6 +8,7 @@ public class CharacterPhysicsController : MonoBehaviour
     [SerializeField] private float gravityConstantModifier = 1f;
     [SerializeField] private float maxPlatformAngleToMakeGrounded = 45;
     [SerializeField] private float minPlatformDistance = 0.01f;
+    [SerializeField] private float velocityReduceConstantWhenFalling = 0.5f;
     private float minMovementDistance = 0.001f;
     private float minConstToBeNotGrounded = 3f;
 
@@ -22,10 +23,12 @@ public class CharacterPhysicsController : MonoBehaviour
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
     protected Rigidbody2D rb;
+    protected CharacterAIMovementController characterAIMovementController;
 
     protected void OnEnable()
     {
         rb = GetComponent<Rigidbody2D>();
+        characterAIMovementController = GetComponent<CharacterAIMovementController>();
     }
 
     protected void Start()
@@ -39,7 +42,8 @@ public class CharacterPhysicsController : MonoBehaviour
     {
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
         isGrounded = (Mathf.Abs(VectorAxisForGravityDir(velocity)) > minConstToBeNotGrounded * gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime) ? false : isGrounded;
-        platformNormal = (!isGrounded) ? Vector2.zero : platformNormal;
+        characterAIMovementController.activatePathFinderIsGrounded = isGrounded;
+        //platformNormal = (!isGrounded) ? Vector2.zero : platformNormal;
         isGravityVer = (gravityDirectionModifier.x != 0) ? false : true;
         gravityDirCorrecter = (gravityDirectionModifier.x + gravityDirectionModifier.y == -1) ? 1 : -1;
         Vector2 deltaPosition = velocity * Time.deltaTime;
@@ -56,7 +60,7 @@ public class CharacterPhysicsController : MonoBehaviour
         MovementInputControl();
     }
 
-    protected virtual void MovementInputControl() {}
+    protected virtual void MovementInputControl() { }
 
     protected float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
     protected float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
@@ -81,6 +85,7 @@ public class CharacterPhysicsController : MonoBehaviour
                 if (projection < 0) { velocity -= projection * currentPlatformNormal; }
                 deltaMovement = (moveDistance > htiBuffer[0].distance - minPlatformDistance) ? (htiBuffer[0].distance - minPlatformDistance) * deltaMovement.normalized : deltaMovement;
             }
+            deltaMovement = (!isGravityAxisMovementControlOn && !isGrounded) ? deltaMovement * velocityReduceConstantWhenFalling : deltaMovement;
         }
         rb.position = rb.position + deltaMovement;
     }

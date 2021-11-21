@@ -10,7 +10,6 @@ public class CharacterMovementController : CharacterPhysicsController
 
     [Header("Initializations")]
     protected SpriteRenderer spriteRenderer;
-    protected CharacterAIMovementController characterAIMovementController;
 
     [Header("Control Paramaters")]
     protected bool isCharacterLookDirectionRight = true;
@@ -18,13 +17,13 @@ public class CharacterMovementController : CharacterPhysicsController
 
     protected void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        characterAIMovementController = GetComponent<CharacterAIMovementController>();
+        spriteRenderer = this.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>();
     }
 
     protected override void MovementInputControl()
     {
         tempVelocityAxisValue = characterAIMovementController.movDirConstant * speed;
+        // tempVelocityAxisValue = Input.GetAxis("Horizontal") * speed;
         if (isGravityVer) { velocity.x = tempVelocityAxisValue; }
         else { velocity.y = tempVelocityAxisValue; }
 
