@@ -41,6 +41,9 @@ public class CharacterGravityController : MonoBehaviour
         if (isDestroyOpStart && (initialCharacterPosHolder - rb.position).magnitude > temporaryOutPortalShiftConstant * 3)
         {
             Destroy(this.gameObject);
+            GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
+            for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
+            portalController.isPortalPlacementActive = true;
         }
 
         bool activatePathFinder = characterAIMovementController.activatePathFinder;
@@ -65,29 +68,26 @@ public class CharacterGravityController : MonoBehaviour
             Vector2 outPortalPos = GameObject.Find("OutPortal").transform.position;
             Vector2 gravityDir = portalController.outPortalGravityDir;
             GameObject teleportedCharacter = Instantiate(characterPrefab, outPortalPos + -gravityDir * temporaryOutPortalShiftConstant, Quaternion.Euler(0, 0, 0));
+            teleportedCharacter.name = "TeleportedCharacter";
             SpriteRenderer spriteRenderer = teleportedCharacter.transform.GetChild(0).GetComponent<SpriteRenderer>();
             CharacterMovementController teleportedChaMovController = teleportedCharacter.GetComponent<CharacterMovementController>();
             if (gravityDir == Vector2.up)
             {
-                //characterMovementController.platformNormal = Vector2.zero;
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, 0);
                 spriteRenderer.flipY = true;
             }
             else if (gravityDir == Vector2.down)
             {
-                //characterMovementController.platformNormal = Vector2.zero;
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, 0);
                 spriteRenderer.flipY = false;
             }
             else if (gravityDir == Vector2.right)
             {
-                //characterMovementController.platformNormal = Vector2.zero;
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, -90);
                 spriteRenderer.flipY = true;
             }
             else if (gravityDir == Vector2.left)
             {
-                //characterMovementController.platformNormal = Vector2.zero;
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, -90);
                 spriteRenderer.flipY = false;
             }

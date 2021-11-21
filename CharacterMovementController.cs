@@ -6,7 +6,7 @@ public class CharacterMovementController : CharacterPhysicsController
 {
     [Header("Movement Paramaters")]
     [SerializeField] private float speed = 5f;
-    [SerializeField] private float jumpOffSpeed = 6f;
+    //private float jumpOffSpeed = 6f; //Jump ability will be not used in the game.
 
     [Header("Initializations")]
     protected SpriteRenderer spriteRenderer;
@@ -23,19 +23,19 @@ public class CharacterMovementController : CharacterPhysicsController
     protected override void MovementInputControl()
     {
         tempVelocityAxisValue = characterAIMovementController.movDirConstant * speed;
-        // tempVelocityAxisValue = Input.GetAxis("Horizontal") * speed;
         if (isGravityVer) { velocity.x = tempVelocityAxisValue; }
         else { velocity.y = tempVelocityAxisValue; }
 
         bool flipSprite = (spriteRenderer.flipX ? ((!isGravityVer) ? velocity.y > 0.1f : (velocity.x > 0.1f)) : ((!isGravityVer) ? (velocity.y < -0.1f) : (velocity.x < -0.1f)));
         if (flipSprite) { spriteRenderer.flipX = !spriteRenderer.flipX; }
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        //Jump ability will be not used in the game.
+        /*if (Input.GetButtonDown("Jump") && isGrounded)
         {
             if (isGravityVer) { velocity.y = gravityDirCorrecter * jumpOffSpeed; }
             else { velocity.x = gravityDirCorrecter * jumpOffSpeed; }
 
             platformNormal = ((isGravityVer) ? Vector2.up : Vector2.right) * gravityDirCorrecter;
-        }
+        }*/
     }
 }

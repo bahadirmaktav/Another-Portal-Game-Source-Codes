@@ -6,9 +6,9 @@ public class CharacterPhysicsController : MonoBehaviour
 {
     [Header("Physics Input Paramaters")]
     [SerializeField] private float gravityConstantModifier = 1f;
-    [SerializeField] private float maxPlatformAngleToMakeGrounded = 45;
     [SerializeField] private float minPlatformDistance = 0.01f;
     [SerializeField] private float velocityReduceConstantWhenFalling = 0.5f;
+    //private float maxPlatformAngleToMakeGrounded = 45; //Inclined platforms will be not used in the game.
     private float minMovementDistance = 0.001f;
     private float minConstToBeNotGrounded = 3f;
 
@@ -43,7 +43,6 @@ public class CharacterPhysicsController : MonoBehaviour
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
         isGrounded = (Mathf.Abs(VectorAxisForGravityDir(velocity)) > minConstToBeNotGrounded * gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime) ? false : isGrounded;
         characterAIMovementController.activatePathFinderIsGrounded = isGrounded;
-        //platformNormal = (!isGrounded) ? Vector2.zero : platformNormal;
         isGravityVer = (gravityDirectionModifier.x != 0) ? false : true;
         gravityDirCorrecter = (gravityDirectionModifier.x + gravityDirectionModifier.y == -1) ? 1 : -1;
         Vector2 deltaPosition = velocity * Time.deltaTime;
@@ -75,7 +74,7 @@ public class CharacterPhysicsController : MonoBehaviour
             if (htiBuffer[0].collider != null)
             {
                 Vector2 currentPlatformNormal = htiBuffer[0].normal;
-                if (isGravityAxisMovementControlOn && VectorAxisForGravityDir(currentPlatformNormal) * gravityDirCorrecter > Mathf.Sin(maxPlatformAngleToMakeGrounded))
+                if (isGravityAxisMovementControlOn /*&& VectorAxisForGravityDir(currentPlatformNormal) * gravityDirCorrecter > Mathf.Sin(maxPlatformAngleToMakeGrounded)*/)
                 {
                     isGrounded = true;
                     platformNormal = currentPlatformNormal;

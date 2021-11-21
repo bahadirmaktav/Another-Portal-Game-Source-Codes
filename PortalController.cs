@@ -5,6 +5,7 @@ using UnityEngine;
 public class PortalController : MonoBehaviour
 {
     [Header("Portal Input Paramaters")]
+    [SerializeField] private float minDistanceBetweenPortals = 0.5f;
 
     [Header("Initializations")]
     protected CharacterAIMovementController characterAIMovementController;
@@ -17,6 +18,7 @@ public class PortalController : MonoBehaviour
     protected GameObject inPortal;
     protected GameObject outPortal;
     [HideInInspector] public Vector2 outPortalGravityDir;
+    [HideInInspector] public bool isPortalPlacementActive = true;
 
     void Awake()
     {
@@ -25,7 +27,7 @@ public class PortalController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && isPortalPlacementActive)
         {
             Vector3 mousePosV3 = Input.mousePosition;
             mousePosV3.z = 10;
@@ -66,7 +68,7 @@ public class PortalController : MonoBehaviour
                     inPortal.name = "InPortal";
                     activePortalCount++;
                 }
-                else if (activePortalCount == 1)
+                else if (activePortalCount == 1 && (inPortal.transform.position - clonedPortalPosition).magnitude > minDistanceBetweenPortals)
                 {
                     outPortal = Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
                     outPortal.name = "OutPortal";
@@ -74,11 +76,7 @@ public class PortalController : MonoBehaviour
                     characterAIMovementController = GameObject.FindGameObjectWithTag("Character").GetComponent<CharacterAIMovementController>();
                     characterAIMovementController.destinationPos = inPortal.transform.position;
                     characterAIMovementController.activatePathFinder = true;
-                }
-                else
-                {
-                    GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
-                    for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
+                    isPortalPlacementActive = false;
                     activePortalCount = 0;
                 }
             }

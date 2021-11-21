@@ -9,6 +9,7 @@ public class CharacterAIMovementController : MonoBehaviour
     protected Seeker seeker;
     protected Rigidbody2D rb;
     protected CharacterMovementController characterMovementController;
+    protected PortalController portalController;
 
     [Header("Path Input Parameters")]
     [SerializeField] private float minDistanceToReachToDes = 0.7f;
@@ -28,10 +29,11 @@ public class CharacterAIMovementController : MonoBehaviour
     void Start()
     {
         characterMovementController = GetComponent<CharacterMovementController>();
+        portalController = GameObject.Find("PortalController").GetComponent<PortalController>();
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
 
-        InvokeRepeating("MovementWithPath", 2f, 0.1f);
+        InvokeRepeating("MovementWithPath", 0f, 0.1f);
     }
 
     void MovementWithPath()
@@ -81,6 +83,13 @@ public class CharacterAIMovementController : MonoBehaviour
         }
         else
         {
+            if (!canCharacterMoveToDes)
+            {
+                GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
+                for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
+                portalController.isPortalPlacementActive = true;
+                Debug.Log("Character can not move there.");
+            }
             movDirConstant = 0;
             activatePathFinder = false;
         }
