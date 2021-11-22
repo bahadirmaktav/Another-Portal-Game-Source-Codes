@@ -5,11 +5,12 @@ using UnityEngine;
 public class CharacterMovementController : CharacterPhysicsController
 {
     [Header("Movement Paramaters")]
-    [SerializeField] private float speed = 5f;
+    [SerializeField] private float speed = 3f;
     //private float jumpOffSpeed = 6f; //Jump ability will be not used in the game.
 
     [Header("Initializations")]
     protected SpriteRenderer spriteRenderer;
+    protected Animator animator;
 
     [Header("Control Paramaters")]
     protected bool isCharacterLookDirectionRight = true;
@@ -18,11 +19,14 @@ public class CharacterMovementController : CharacterPhysicsController
     protected void Awake()
     {
         spriteRenderer = this.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>();
+        animator = this.gameObject.transform.GetChild(0).GetComponent<Animator>();
     }
 
     protected override void MovementInputControl()
     {
         tempVelocityAxisValue = characterAIMovementController.movDirConstant * speed;
+        if (tempVelocityAxisValue == 0) { animator.SetBool("isRunning", false); }
+        else { animator.SetBool("isRunning", true); }
         if (isGravityVer) { velocity.x = tempVelocityAxisValue; }
         else { velocity.y = tempVelocityAxisValue; }
 

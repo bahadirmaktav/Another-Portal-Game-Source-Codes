@@ -13,7 +13,7 @@ public class CharacterAIMovementController : MonoBehaviour
 
     [Header("Path Input Parameters")]
     [SerializeField] private float minDistanceToReachToDes = 0.4f;
-    [SerializeField] private float minJumpDistanceToCancelMov = 1f;
+    [SerializeField] private float minJumpDistanceToCancelMov = 1.5f;
 
     [Header("Path Control Paramaters")]
     protected Path path;
