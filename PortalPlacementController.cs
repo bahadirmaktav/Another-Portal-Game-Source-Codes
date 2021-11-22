@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PortalController : MonoBehaviour
+public class PortalPlacementController : MonoBehaviour
 {
     [Header("Portal Input Paramaters")]
     [SerializeField] private float minDistanceBetweenPortals = 0.5f;

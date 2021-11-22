@@ -2,48 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterGravityController : MonoBehaviour
+public class PortalCharacterController : MonoBehaviour
 {
     [Header("Gravity Input Paramaters")]
     [SerializeField] private float temporaryOutPortalShiftConstant = 0.5f;
+    [SerializeField] private float characterVelocityReduceWhenEnteredPortal = 0.3f;
 
     [Header("Initializations")]
     protected CharacterMovementController characterMovementController;
     protected Rigidbody2D rb;
     protected CharacterAIMovementController characterAIMovementController;
-    protected PortalController portalController;
+    protected PortalPlacementController portalPlacementController;
+    protected BoxCollider2D coll;
     public GameObject characterPrefab;
 
     [Header("Gravity Control Parameters")]
     protected float portalDetectRayLength = 1f;
     protected int layerMaskOnlyPortal = 1 << 12;
-    protected bool enteredPortal = false;
-    protected bool exitedPortal = true;
-    protected bool isDestroyOpStart = false;
+    protected bool enteredPortal;
+    protected bool exitedPortal;
+    protected bool isDestroyOpStart;
     protected Vector2 initialCharacterPosHolder;
+    protected GameObject oldGameObj;
+
+    protected void Initializations(GameObject character)
+    {
+        characterMovementController = character.GetComponent<CharacterMovementController>();
+        characterAIMovementController = character.GetComponent<CharacterAIMovementController>();
+        portalPlacementController = GetComponent<PortalPlacementController>();
+        rb = character.GetComponent<Rigidbody2D>();
+        coll = character.GetComponent<BoxCollider2D>();
+        initialCharacterPosHolder = rb.position;
+        enteredPortal = false;
+        exitedPortal = true;
+        isDestroyOpStart = false;
+    }
 
     protected void Awake()
     {
-        characterMovementController = GetComponent<CharacterMovementController>();
-        characterAIMovementController = GetComponent<CharacterAIMovementController>();
-        portalController = GameObject.Find("PortalController").GetComponent<PortalController>();
-        rb = GetComponent<Rigidbody2D>();
-        initialCharacterPosHolder = rb.position;
+        GameObject character = GameObject.Find("Character");
+        Initializations(character);
     }
 
-    protected void Update()
+    protected void FixedUpdate()
     {
         if (exitedPortal && (initialCharacterPosHolder - rb.position).magnitude > temporaryOutPortalShiftConstant * 3)
         {
-            gameObject.GetComponent<BoxCollider2D>().enabled = true;
+            coll.enabled = true;
             exitedPortal = false;
         }
         if (isDestroyOpStart && (initialCharacterPosHolder - rb.position).magnitude > temporaryOutPortalShiftConstant * 3)
         {
-            Destroy(this.gameObject);
+            Destroy(oldGameObj);
             GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
             for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
-            portalController.isPortalPlacementActive = true;
+            portalPlacementController.isPortalPlacementActive = true;
+            isDestroyOpStart = false;
         }
 
         bool activatePathFinder = characterAIMovementController.activatePathFinder;
@@ -62,15 +76,20 @@ public class CharacterGravityController : MonoBehaviour
             }
         }
 
-        if (enteredPortal && !activatePathFinder)
+        if (enteredPortal)
         {
-            rb.gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            coll.enabled = false;
+            characterAIMovementController.movDirConstant *= characterVelocityReduceWhenEnteredPortal;
+            characterAIMovementController.activatePathFinder = false;
+            oldGameObj = rb.gameObject;
+            float oldGameObjVelocityAmount = (characterMovementController.isGravityVer) ? Mathf.Abs(characterMovementController.velocity.y) : Mathf.Abs(characterMovementController.velocity.x);
             Vector2 outPortalPos = GameObject.Find("OutPortal").transform.position;
-            Vector2 gravityDir = portalController.outPortalGravityDir;
+            Vector2 gravityDir = portalPlacementController.outPortalGravityDir;
             GameObject teleportedCharacter = Instantiate(characterPrefab, outPortalPos + -gravityDir * temporaryOutPortalShiftConstant, Quaternion.Euler(0, 0, 0));
+            oldGameObj.name = "OldCharacter";
             teleportedCharacter.name = "TeleportedCharacter";
+            Initializations(teleportedCharacter);
             SpriteRenderer spriteRenderer = teleportedCharacter.transform.GetChild(0).GetComponent<SpriteRenderer>();
-            CharacterMovementController teleportedChaMovController = teleportedCharacter.GetComponent<CharacterMovementController>();
             if (gravityDir == Vector2.up)
             {
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -91,10 +110,11 @@ public class CharacterGravityController : MonoBehaviour
                 teleportedCharacter.transform.rotation = Quaternion.Euler(0, 0, -90);
                 spriteRenderer.flipY = false;
             }
-            teleportedChaMovController.gravityDirectionModifier = gravityDir;
+            characterMovementController.velocity = gravityDir * oldGameObjVelocityAmount;
+            characterMovementController.gravityDirectionModifier = gravityDir;
+            characterMovementController.isGravityVer = (gravityDir.x != 0) ? false : true;
             enteredPortal = false;
             isDestroyOpStart = true;
-            initialCharacterPosHolder = rb.position;
         }
     }
 }

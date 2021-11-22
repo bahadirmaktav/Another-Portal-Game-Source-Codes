@@ -17,7 +17,7 @@ public class CharacterPhysicsController : MonoBehaviour
     [HideInInspector] public float gravityDirCorrecter = 1f;
     [HideInInspector] public Vector2 gravityDirectionModifier = new Vector2(0, -1);
     [HideInInspector] public Vector2 platformNormal;
-    protected Vector2 velocity;
+    [HideInInspector] public Vector2 velocity;
     protected bool isGrounded = false;
 
     [Header("Initializations")]
