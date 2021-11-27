@@ -79,6 +79,7 @@ public class PortalCharacterController : MonoBehaviour
         if (enteredPortal)
         {
             coll.enabled = false;
+            characterMovementController.isGrounded = false;
             characterAIMovementController.movDirConstant *= characterVelocityReduceWhenEnteredPortal;
             characterAIMovementController.activatePathFinder = false;
             oldGameObj = rb.gameObject;
@@ -88,6 +89,7 @@ public class PortalCharacterController : MonoBehaviour
             GameObject teleportedCharacter = Instantiate(characterPrefab, outPortalPos + -gravityDir * temporaryOutPortalShiftConstant, Quaternion.Euler(0, 0, 0));
             oldGameObj.name = "OldCharacter";
             teleportedCharacter.name = "TeleportedCharacter";
+            teleportedCharacter.GetComponent<CharacterLevelController>().totalCollectableObjectsCounter = oldGameObj.GetComponent<CharacterLevelController>().totalCollectableObjectsCounter;
             Initializations(teleportedCharacter);
             SpriteRenderer spriteRenderer = teleportedCharacter.transform.GetChild(0).GetComponent<SpriteRenderer>();
             if (gravityDir == Vector2.up)
@@ -115,6 +117,7 @@ public class PortalCharacterController : MonoBehaviour
             characterMovementController.isGravityVer = (gravityDir.x != 0) ? false : true;
             enteredPortal = false;
             isDestroyOpStart = true;
+            portalPlacementController.allowedPortalPairPlacamentNumber -= 1;
         }
     }
 }

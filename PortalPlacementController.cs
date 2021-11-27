@@ -6,6 +6,7 @@ public class PortalPlacementController : MonoBehaviour
 {
     [Header("Portal Input Paramaters")]
     [SerializeField] private float minDistanceBetweenPortals = 0.5f;
+    public int allowedPortalPairPlacamentNumber = 3;
 
     [Header("Initializations")]
     protected CharacterAIMovementController characterAIMovementController;
@@ -19,6 +20,7 @@ public class PortalPlacementController : MonoBehaviour
     protected GameObject outPortal;
     [HideInInspector] public Vector2 outPortalGravityDir;
     [HideInInspector] public bool isPortalPlacementActive = true;
+    [HideInInspector] public bool isPortalQuotaFinished = false;
 
     void Awake()
     {
@@ -27,7 +29,7 @@ public class PortalPlacementController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && isPortalPlacementActive)
+        if (Input.GetMouseButtonDown(0) && isPortalPlacementActive && !isPortalQuotaFinished)
         {
             Vector3 mousePosV3 = Input.mousePosition;
             mousePosV3.z = 10;
@@ -81,5 +83,6 @@ public class PortalPlacementController : MonoBehaviour
                 }
             }
         }
+        if (allowedPortalPairPlacamentNumber == 0) { isPortalQuotaFinished = true; }
     }
 }

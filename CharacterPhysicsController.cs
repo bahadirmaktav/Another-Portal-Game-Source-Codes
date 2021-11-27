@@ -18,7 +18,8 @@ public class CharacterPhysicsController : MonoBehaviour
     [HideInInspector] public Vector2 gravityDirectionModifier = new Vector2(0, -1);
     [HideInInspector] public Vector2 platformNormal;
     [HideInInspector] public Vector2 velocity;
-    protected bool isGrounded = false;
+    [HideInInspector] public bool isGrounded = false;
+    private int onlyMidgroundLayerMask = 1 << 10;
 
     [Header("Initializations")]
     protected ContactFilter2D contactFilter;
@@ -34,7 +35,7 @@ public class CharacterPhysicsController : MonoBehaviour
     protected void Start()
     {
         contactFilter.useTriggers = false;
-        contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
+        contactFilter.SetLayerMask(onlyMidgroundLayerMask);
         contactFilter.useLayerMask = true;
     }
 
