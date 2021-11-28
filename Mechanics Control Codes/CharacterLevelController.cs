@@ -13,7 +13,7 @@ public class CharacterLevelController : MonoBehaviour
     private GameObject reachPoint;
 
     [Header("Level Control Parameters")]
-    public int totalCollectableObjectsCounter; // When it equals to 1 the ReachPoint should be activated.
+    [HideInInspector] public int totalCollectableObjectsCounter; // When it equals to 1 the ReachPoint should be activated.
     private int maxXaxis = 18;
     private int maxYaxis = 10;
     private bool isLevelFinished = false;

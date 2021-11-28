@@ -9,23 +9,23 @@ public class PortalCharacterController : MonoBehaviour
     [SerializeField] private float characterVelocityReduceWhenEnteredPortal = 0.3f;
 
     [Header("Initializations")]
-    protected CharacterMovementController characterMovementController;
-    protected Rigidbody2D rb;
-    protected CharacterAIMovementController characterAIMovementController;
-    protected PortalPlacementController portalPlacementController;
-    protected BoxCollider2D coll;
     public GameObject characterPrefab;
+    private CharacterMovementController characterMovementController;
+    private Rigidbody2D rb;
+    private CharacterAIMovementController characterAIMovementController;
+    private PortalPlacementController portalPlacementController;
+    private BoxCollider2D coll;
 
     [Header("Gravity Control Parameters")]
-    protected float portalDetectRayLength = 1f;
-    protected int layerMaskOnlyPortal = 1 << 12;
-    protected bool enteredPortal;
-    protected bool exitedPortal;
-    protected bool isDestroyOpStart;
-    protected Vector2 initialCharacterPosHolder;
-    protected GameObject oldGameObj;
+    private float portalDetectRayLength = 1f;
+    private int layerMaskOnlyPortal = 1 << 12;
+    private bool enteredPortal;
+    private bool exitedPortal;
+    private bool isDestroyOpStart;
+    private Vector2 initialCharacterPosHolder;
+    private GameObject oldGameObj;
 
-    protected void Initializations(GameObject character)
+    private void Initializations(GameObject character)
     {
         characterMovementController = character.GetComponent<CharacterMovementController>();
         characterAIMovementController = character.GetComponent<CharacterAIMovementController>();
@@ -38,13 +38,13 @@ public class PortalCharacterController : MonoBehaviour
         isDestroyOpStart = false;
     }
 
-    protected void Awake()
+    private void Awake()
     {
         GameObject character = GameObject.Find("Character");
         Initializations(character);
     }
 
-    protected void FixedUpdate()
+    private void FixedUpdate()
     {
         if (exitedPortal && (initialCharacterPosHolder - rb.position).magnitude > temporaryOutPortalShiftConstant * 3)
         {

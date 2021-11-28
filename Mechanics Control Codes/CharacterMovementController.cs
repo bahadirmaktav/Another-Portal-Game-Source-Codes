@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class CharacterMovementController : CharacterPhysicsController
 {
-    [Header("Movement Paramaters")]
+    [Header("Initializations")]
+    private SpriteRenderer spriteRenderer;
+    private Animator animator;
+
+    [Header("Movement Input Paramaters")]
     [SerializeField] private float speed = 3f;
     //private float jumpOffSpeed = 6f; //Jump ability will be not used in the game.
 
-    [Header("Initializations")]
-    protected SpriteRenderer spriteRenderer;
-    protected Animator animator;
+    [Header("Movement Control Paramaters")]
+    private float tempVelocityAxisValue;
 
-    [Header("Control Paramaters")]
-    protected bool isCharacterLookDirectionRight = true;
-    protected float tempVelocityAxisValue;
-
-    protected void Awake()
+    private void Awake()
     {
         spriteRenderer = this.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>();
         animator = this.gameObject.transform.GetChild(0).GetComponent<Animator>();

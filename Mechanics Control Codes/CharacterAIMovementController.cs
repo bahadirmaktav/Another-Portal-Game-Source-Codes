@@ -6,21 +6,21 @@ using Pathfinding;
 public class CharacterAIMovementController : MonoBehaviour
 {
     [Header("Initializations")]
-    protected Seeker seeker;
-    protected Rigidbody2D rb;
-    protected CharacterMovementController characterMovementController;
-    protected PortalPlacementController portalPlacementController;
+    private Seeker seeker;
+    private Rigidbody2D rb;
+    private CharacterMovementController characterMovementController;
+    private PortalPlacementController portalPlacementController;
 
     [Header("Path Input Parameters")]
     [SerializeField] private float minDistanceToReachToDes = 0.4f;
     [SerializeField] private float minJumpDistanceToCancelMov = 1.5f;
 
     [Header("Path Control Paramaters")]
-    protected Path path;
-    protected Vector2 characterPos;
-    protected float gravityAxisCharacter;
-    protected bool isGravityVer;
-    protected bool canCharacterMoveToDes = true;
+    private Path path;
+    private Vector2 characterPos;
+    private float gravityAxisCharacter;
+    private bool isGravityVer;
+    private bool canCharacterMoveToDes = true;
     [HideInInspector] public float movDirConstant;
     [HideInInspector] public Vector2 destinationPos;
     [HideInInspector] public bool activatePathFinder = false;

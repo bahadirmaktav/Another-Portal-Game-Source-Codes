@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class CharacterPhysicsController : MonoBehaviour
 {
+    [Header("Initializations")]
+    private ContactFilter2D contactFilter;
+    private Rigidbody2D rb;
+    protected CharacterAIMovementController characterAIMovementController;
+
     [Header("Physics Input Paramaters")]
     [SerializeField] private float gravityConstantModifier = 1f;
     [SerializeField] private float minPlatformDistance = 0.01f;
@@ -21,25 +26,20 @@ public class CharacterPhysicsController : MonoBehaviour
     [HideInInspector] public bool isGrounded = false;
     private int onlyMidgroundLayerMask = 1 << 10;
 
-    [Header("Initializations")]
-    protected ContactFilter2D contactFilter;
-    protected Rigidbody2D rb;
-    protected CharacterAIMovementController characterAIMovementController;
-
-    protected void OnEnable()
+    private void OnEnable()
     {
         rb = GetComponent<Rigidbody2D>();
         characterAIMovementController = GetComponent<CharacterAIMovementController>();
     }
 
-    protected void Start()
+    private void Start()
     {
         contactFilter.useTriggers = false;
         contactFilter.SetLayerMask(onlyMidgroundLayerMask);
         contactFilter.useLayerMask = true;
     }
 
-    protected void FixedUpdate()
+    private void FixedUpdate()
     {
         velocity += gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime * gravityDirectionModifier;
         isGrounded = (Mathf.Abs(VectorAxisForGravityDir(velocity)) > minConstToBeNotGrounded * gravityConstantModifier * Physics2D.gravity.magnitude * Time.deltaTime) ? false : isGrounded;
@@ -55,17 +55,17 @@ public class CharacterPhysicsController : MonoBehaviour
         MovementPhysicsControl(deltaMovement, true, isGravityVer, gravityDirCorrecter);
     }
 
-    protected void Update()
+    private void Update()
     {
         MovementInputControl();
     }
 
     protected virtual void MovementInputControl() { }
 
-    protected float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
-    protected float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
+    private float VectorAxisForGravityDir(Vector2 inputVector) => (isGravityVer) ? inputVector.y : inputVector.x;
+    private float VectorAxisForMovementDir(Vector2 inputVector) => (isGravityVer) ? inputVector.x : inputVector.y;
 
-    protected void MovementPhysicsControl(Vector2 deltaMovement, bool isGravityAxisMovementControlOn, bool isGravityVer, float gravityDirCorrecter)
+    private void MovementPhysicsControl(Vector2 deltaMovement, bool isGravityAxisMovementControlOn, bool isGravityVer, float gravityDirCorrecter)
     {
         float moveDistance = deltaMovement.magnitude;
         if (moveDistance > minMovementDistance)

@@ -9,15 +9,15 @@ public class PortalPlacementController : MonoBehaviour
     public int allowedPortalPairPlacamentNumber = 3;
 
     [Header("Initializations")]
-    protected CharacterAIMovementController characterAIMovementController;
-    protected CompositeCollider2D midGroundColl;
     public GameObject portalPrefab;
+    private CharacterAIMovementController characterAIMovementController;
+    private CompositeCollider2D midGroundColl;
 
     [Header("Portal Control Parameters")]
-    protected int layerMaskOnlyPortalPlacePlatform = 1 << 13;
-    protected int activePortalCount = 0;
-    protected GameObject inPortal;
-    protected GameObject outPortal;
+    private int layerMaskOnlyPortalPlacePlatform = 1 << 13;
+    private int activePortalCount = 0;
+    private GameObject inPortal;
+    private GameObject outPortal;
     [HideInInspector] public Vector2 outPortalGravityDir;
     [HideInInspector] public bool isPortalPlacementActive = true;
     [HideInInspector] public bool isPortalQuotaFinished = false;
