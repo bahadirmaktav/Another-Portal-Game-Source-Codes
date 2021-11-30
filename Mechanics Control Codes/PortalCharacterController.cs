@@ -117,7 +117,8 @@ public class PortalCharacterController : MonoBehaviour
             characterMovementController.isGravityVer = (gravityDir.x != 0) ? false : true;
             enteredPortal = false;
             isDestroyOpStart = true;
-            portalPlacementController.allowedPortalPairPlacamentNumber -= 1;
+            portalPlacementController.numberOfPortalPairPlaced += 1;
+            portalPlacementController.portalUsedText.text =  (portalPlacementController.allowedTotalPortalPair - portalPlacementController.numberOfPortalPairPlaced).ToString();
         }
     }
 }

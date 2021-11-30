@@ -1,17 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PortalPlacementController : MonoBehaviour
 {
     [Header("Portal Input Paramaters")]
     [SerializeField] private float minDistanceBetweenPortals = 0.5f;
-    public int allowedPortalPairPlacamentNumber = 3;
+    [HideInInspector] public int numberOfPortalPairPlaced = 0;
+    public int allowedTotalPortalPair;
 
     [Header("Initializations")]
     public GameObject portalPrefab;
     private CharacterAIMovementController characterAIMovementController;
     private CompositeCollider2D midGroundColl;
+    [HideInInspector] public Text portalUsedText;
 
     [Header("Portal Control Parameters")]
     private int layerMaskOnlyPortalPlacePlatform = 1 << 13;
@@ -25,11 +29,13 @@ public class PortalPlacementController : MonoBehaviour
     void Awake()
     {
         midGroundColl = GameObject.Find("TilemapMidground").GetComponent<CompositeCollider2D>();
+        portalUsedText = GameObject.Find("PortalUsedText").GetComponent<Text>();
+        portalUsedText.text = (allowedTotalPortalPair - numberOfPortalPairPlaced).ToString();
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && isPortalPlacementActive && !isPortalQuotaFinished)
+        if (Input.GetMouseButtonDown(0) && isPortalPlacementActive && !isPortalQuotaFinished && !EventSystem.current.IsPointerOverGameObject())
         {
             Vector3 mousePosV3 = Input.mousePosition;
             mousePosV3.z = 10;
@@ -83,6 +89,6 @@ public class PortalPlacementController : MonoBehaviour
                 }
             }
         }
-        if (allowedPortalPairPlacamentNumber == 0) { isPortalQuotaFinished = true; }
+        if (numberOfPortalPairPlaced == allowedTotalPortalPair) { isPortalQuotaFinished = true; }
     }
 }

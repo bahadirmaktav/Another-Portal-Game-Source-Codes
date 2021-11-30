@@ -11,6 +11,7 @@ public class CharacterLevelController : MonoBehaviour
     private CharacterMovementController characterMovementController;
     private Animator animator;
     private GameObject reachPoint;
+    private GamePageController gamePageController;
 
     [Header("Level Control Parameters")]
     [HideInInspector] public int totalCollectableObjectsCounter; // When it equals to 1 the ReachPoint should be activated.
@@ -30,6 +31,7 @@ public class CharacterLevelController : MonoBehaviour
         characterMovementController = GetComponent<CharacterMovementController>();
         animator = transform.GetChild(0).GetComponent<Animator>();
         reachPoint = GameObject.FindGameObjectWithTag("ReachPoint");
+        gamePageController = GameObject.Find("GamePageController").GetComponent<GamePageController>();
     }
 
     void FixedUpdate()
@@ -52,6 +54,7 @@ public class CharacterLevelController : MonoBehaviour
             Destroy(coll.gameObject);
             totalCollectableObjectsCounter = GameObject.FindGameObjectsWithTag("CollectableObjects").Length;
             if (totalCollectableObjectsCounter == 1) { ReachPointActivate(); }
+            gamePageController.leftStonesText.text = (totalCollectableObjectsCounter - 1).ToString();
         }
     }
 
@@ -64,9 +67,13 @@ public class CharacterLevelController : MonoBehaviour
     public void FinishTheLevel()
     {
         Debug.Log("finish level");
-        characterMovementController.gravityDirectionModifier = Vector2.zero;
+        characterMovementController.enabled = false;
         rb.position = reachPoint.transform.position;
+        Destroy(portalPlacementController.gameObject);
+        GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
+        for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
         animator.SetBool("isLevelCompleted", true);
+        gamePageController.ControlFinishLevelPage();
     }
 
     public void ReachPointActivate()
