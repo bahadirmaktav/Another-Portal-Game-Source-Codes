@@ -106,7 +106,7 @@ public class DataController
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Create(Application.persistentDataPath + "/gamesettings.dat");
             GameSettingsData data = new GameSettingsData();
-            data.completedLevelCounter = 1;
+            data.completedLevelCounter = 0;
             bf.Serialize(file, data);
             file.Close();
             Debug.Log("Data initialized.");

@@ -15,6 +15,7 @@ public class PortalCharacterController : MonoBehaviour
     private CharacterAIMovementController characterAIMovementController;
     private PortalPlacementController portalPlacementController;
     private BoxCollider2D coll;
+    private GlitchEffect glitchEffect;
 
     [Header("Gravity Control Parameters")]
     private float portalDetectRayLength = 1f;
@@ -42,6 +43,7 @@ public class PortalCharacterController : MonoBehaviour
     {
         GameObject character = GameObject.Find("Character");
         Initializations(character);
+        glitchEffect = GameObject.Find("Main Camera").GetComponent<GlitchEffect>();
     }
 
     private void FixedUpdate()
@@ -58,6 +60,7 @@ public class PortalCharacterController : MonoBehaviour
             for (int i = 0; i < portals.Length; i++) { Destroy(portals[i]); }
             portalPlacementController.isPortalPlacementActive = true;
             isDestroyOpStart = false;
+            glitchEffect.enabled = false;
         }
 
         bool activatePathFinder = characterAIMovementController.activatePathFinder;
@@ -119,6 +122,7 @@ public class PortalCharacterController : MonoBehaviour
             isDestroyOpStart = true;
             portalPlacementController.numberOfPortalPairPlaced += 1;
             portalPlacementController.portalUsedText.text =  (portalPlacementController.allowedTotalPortalPair - portalPlacementController.numberOfPortalPairPlaced).ToString();
+            glitchEffect.enabled = true;
         }
     }
 }

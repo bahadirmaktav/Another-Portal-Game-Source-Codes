@@ -78,6 +78,7 @@ public class CharacterLevelController : MonoBehaviour
 
     public void ReachPointActivate()
     {
+        reachPoint.GetComponent<Animator>().SetBool("isReachPointActive", true);
         Debug.Log("reachpoint activated");
     }
 }

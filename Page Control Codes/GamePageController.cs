@@ -57,6 +57,9 @@ public class GamePageController : MonoBehaviour
 
     public void ControlFinishLevelPage()
     {
+        DataController dataController = new DataController();
+        int nextLevelIndex = SceneManager.GetActiveScene().buildIndex - 2;
+        dataController.SaveCompletedLevelCounter(nextLevelIndex);
         levelFinishTransitionController.SetActive(true);
         levelFinishTransitionControllerAnimator.SetBool("isLevelFinished", true);
     }

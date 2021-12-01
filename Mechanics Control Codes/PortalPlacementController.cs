@@ -25,6 +25,7 @@ public class PortalPlacementController : MonoBehaviour
     [HideInInspector] public Vector2 outPortalGravityDir;
     [HideInInspector] public bool isPortalPlacementActive = true;
     [HideInInspector] public bool isPortalQuotaFinished = false;
+    [HideInInspector] public Vector2 inPortalNormalInverse;
 
     void Awake()
     {
@@ -75,6 +76,7 @@ public class PortalPlacementController : MonoBehaviour
                     inPortal = Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
                     inPortal.name = "InPortal";
                     activePortalCount++;
+                    inPortalNormalInverse = outPortalGravityDir * -1;
                 }
                 else if (activePortalCount == 1 && (inPortal.transform.position - clonedPortalPosition).magnitude > minDistanceBetweenPortals)
                 {
