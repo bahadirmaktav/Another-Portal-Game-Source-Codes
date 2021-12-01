@@ -15,9 +15,9 @@ public class LevelsPageController : MonoBehaviour
     public int maxLevelCounter = 5;
 
     [Header("Levels Page Control Parameters")]
-    private float firstXaxisPos = -3.2f;
-    private float yAxisPos = -1.2f;
-    private float distanceBetweenButtons = 1.3f;
+    private float firstXaxisPos = -4.5f;
+    private float yAxisPos = -1.8f;
+    private float distanceBetweenButtons = 1.8f;
     private GameObject[] levelButtons;
     private int completedLevelCounter;
 
