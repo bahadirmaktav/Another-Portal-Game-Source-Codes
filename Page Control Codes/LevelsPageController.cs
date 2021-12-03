@@ -15,9 +15,6 @@ public class LevelsPageController : MonoBehaviour
     public int maxLevelCounter = 5;
 
     [Header("Levels Page Control Parameters")]
-    private float firstXaxisPos = -4.5f;
-    private float yAxisPos = -1.8f;
-    private float distanceBetweenButtons = 1.8f;
     private GameObject[] levelButtons;
     private int completedLevelCounter;
 
@@ -27,9 +24,13 @@ public class LevelsPageController : MonoBehaviour
         completedLevelCounter = dataController.GetCompletedLevelCounter();
         levelButtons = new GameObject[maxLevelCounter];
         parentOfLevelButtons = GameObject.Find("LevelButtonsContainer");
+        Vector3 levelsButtonPanelPos = GameObject.Find("LevelButtonsPanel").transform.position;
+        float widthOfButton = levelButtonPrefab.GetComponent<RectTransform>().rect.width;
+
         for (int i = 0; i < maxLevelCounter; i++)
         {
-            GameObject levelButtonInstantiated = Instantiate(levelButtonPrefab, new Vector3(firstXaxisPos + i * distanceBetweenButtons, yAxisPos, 0), Quaternion.Euler(0, 0, 0), parentOfLevelButtons.transform);
+            GameObject levelButtonInstantiated = Instantiate(levelButtonPrefab, levelsButtonPanelPos, Quaternion.Euler(0, 0, 0), parentOfLevelButtons.transform);
+            levelButtonInstantiated.GetComponent<RectTransform>().localPosition += new Vector3(widthOfButton * i, 0, 0);
             levelButtons[i] = levelButtonInstantiated;
             levelButtons[i].GetComponent<Button>().onClick.AddListener(GoToSelectedLevel);
             if (completedLevelCounter >= i)
