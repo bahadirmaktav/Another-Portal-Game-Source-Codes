@@ -25,9 +25,7 @@ public class CharacterAIMovementController : MonoBehaviour
     [HideInInspector] public Vector2 destinationPos;
     [HideInInspector] public bool activatePathFinder = false;
     [HideInInspector] public bool activatePathFinderIsGrounded = true;
-    //public Vector2 firstPathVecSaved;
-    //public float maxDistanceBetweenCharAndFirstPath = 0.5f;
-    //public bool isCharacterReachedFirstPath = true;
+    [HideInInspector] public bool afterNoLeftPortalCharacterReachPointTest = true;
 
     void Start()
     {
@@ -35,29 +33,13 @@ public class CharacterAIMovementController : MonoBehaviour
         portalPlacementController = GameObject.Find("PortalController").GetComponent<PortalPlacementController>();
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
-        //firstPathVecSaved = rb.position;
 
         InvokeRepeating("MovementWithPath", 0f, 0.1f);
     }
 
-    //void FixedUpdate()
-    //{
-    //    if (!characterMovementController.isGrounded)
-    //    {
-    //        isCharacterReachedFirstPath = true;
-    //        firstPathVecSaved = rb.position;
-    //    }
-    //    else
-    //    {
-    //        isCharacterReachedFirstPath = (characterMovementController.velocity != Vector2.zero) ? (((rb.position - firstPathVecSaved).magnitude < maxDistanceBetweenCharAndFirstPath) ? true : false) : true;
-    //    }
-    //    Debug.Log(rb.position + "-");
-    //    Debug.Log(firstPathVecSaved);
-    //}
-
     void MovementWithPath()
     {
-        if (activatePathFinder && activatePathFinderIsGrounded) //&& isCharacterReachedFirstPath
+        if (activatePathFinder && activatePathFinderIsGrounded)
         {
             canCharacterMoveToDes = true;
             movDirConstant = 0;
@@ -85,6 +67,7 @@ public class CharacterAIMovementController : MonoBehaviour
             float gravityAxisWayPoint = (isGravityVer) ? path.vectorPath[i].y : path.vectorPath[i].x;
             if ((gravityAxisWayPoint - gravityAxisCharacter) * characterMovementController.gravityDirCorrecter > minJumpDistanceToCancelMov || portalPlacementController.inPortalNormalInverse != characterMovementController.gravityDirectionModifier)
             {
+                Debug.Log("yüksek yer");
                 canCharacterMoveToDes = false;
                 break;
             }
@@ -99,8 +82,6 @@ public class CharacterAIMovementController : MonoBehaviour
             Vector2 firstPathVec = firstPathPoint - characterPos;
             movDirConstant = (isGravityVer) ? (Vector2.Dot(firstPathVec, Vector2.right) > 0) ? 1f : -1f
                 : (Vector2.Dot(firstPathVec, Vector2.up) > 0) ? -1f : 1f;
-            //isCharacterReachedFirstPath = false;
-            //firstPathVecSaved = firstPathPoint;
         }
         else
         {
@@ -113,7 +94,7 @@ public class CharacterAIMovementController : MonoBehaviour
             }
             movDirConstant = 0;
             activatePathFinder = false;
-            //firstPathVecSaved = rb.position;
+            afterNoLeftPortalCharacterReachPointTest = false;
         }
     }
 }

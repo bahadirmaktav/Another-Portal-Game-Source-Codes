@@ -14,12 +14,8 @@ public class GamePageController : MonoBehaviour
 
     private void Awake()
     {
-        levelPauseTransitionController = GameObject.Find("LevelPauseTransitionController");
-        levelPauseTransitionControllerAnimator = levelPauseTransitionController.GetComponent<Animator>();
-        levelPauseTransitionController.SetActive(false);
-        levelFinishTransitionController = GameObject.Find("LevelFinishTransitionController");
-        levelFinishTransitionControllerAnimator = levelFinishTransitionController.GetComponent<Animator>();
-        levelFinishTransitionController.SetActive(false);
+        levelPauseTransitionControllerAnimator = GameObject.Find("LevelPauseTransitionController").GetComponent<Animator>();
+        levelFinishTransitionControllerAnimator = GameObject.Find("LevelFinishTransitionController").GetComponent<Animator>();
         leftStonesText = GameObject.Find("LeftStonesText").GetComponent<Text>();
         leftStonesText.text = (GameObject.FindGameObjectsWithTag("CollectableObjects").Length).ToString();
     }
@@ -32,14 +28,12 @@ public class GamePageController : MonoBehaviour
 
     public void PauseTheLevel()
     {
-        levelPauseTransitionController.SetActive(true);
         levelPauseTransitionControllerAnimator.SetBool("isContinued", false);
         levelPauseTransitionControllerAnimator.SetBool("isPaused", true);
     }
 
     public void ContinueTheLevel()
     {
-        levelPauseTransitionController.SetActive(false);
         levelPauseTransitionControllerAnimator.SetBool("isPaused", false);
         levelPauseTransitionControllerAnimator.SetBool("isContinued", true);
     }
@@ -60,7 +54,6 @@ public class GamePageController : MonoBehaviour
         DataController dataController = new DataController();
         int nextLevelIndex = SceneManager.GetActiveScene().buildIndex - 2;
         dataController.SaveCompletedLevelCounter(nextLevelIndex);
-        levelFinishTransitionController.SetActive(true);
         levelFinishTransitionControllerAnimator.SetBool("isLevelFinished", true);
     }
 }

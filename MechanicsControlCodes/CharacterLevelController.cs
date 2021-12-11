@@ -9,6 +9,7 @@ public class CharacterLevelController : MonoBehaviour
     private Rigidbody2D rb;
     private PortalPlacementController portalPlacementController;
     private CharacterMovementController characterMovementController;
+    private CharacterAIMovementController characterAIMovementController;
     private Animator animator;
     private GameObject reachPoint;
     private GamePageController gamePageController;
@@ -18,6 +19,7 @@ public class CharacterLevelController : MonoBehaviour
     private int maxXaxis = 18;
     private int maxYaxis = 10;
     private bool isLevelFinished = false;
+    private Vector2 reachPointPos;
 
     void OnEnable()
     {
@@ -32,13 +34,21 @@ public class CharacterLevelController : MonoBehaviour
         animator = transform.GetChild(0).GetComponent<Animator>();
         reachPoint = GameObject.FindGameObjectWithTag("ReachPoint");
         gamePageController = GameObject.Find("GamePageController").GetComponent<GamePageController>();
+        characterAIMovementController = GetComponent<CharacterAIMovementController>();
+        reachPointPos = reachPoint.transform.position;
     }
 
     void FixedUpdate()
     {
         if ((Mathf.Abs(rb.position.x) > maxXaxis || Mathf.Abs(rb.position.y) > maxYaxis) || (portalPlacementController.isPortalQuotaFinished && GetComponent<CharacterPhysicsController>().isGrounded && !isLevelFinished))
         {
-            RestartTheLevel();
+            Debug.Log("here");
+            characterAIMovementController.activatePathFinder = true;
+            characterAIMovementController.destinationPos = reachPointPos;
+            portalPlacementController.inPortalNormalInverse = characterMovementController.gravityDirectionModifier;
+            if (!characterAIMovementController.afterNoLeftPortalCharacterReachPointTest)
+            { Debug.Break(); //RestartTheLevel(); 
+            }
         }
     }
 

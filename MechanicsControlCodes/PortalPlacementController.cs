@@ -66,6 +66,7 @@ public class PortalPlacementController : MonoBehaviour
                 float closestHitDistance = closestHit.distance;
                 Vector3 clonedPortalPosition = new Vector3(mousePosV2.x + (closestHitNormal.x * -closestHitDistance), mousePosV2.y + (closestHitNormal.y * -closestHitDistance), 0);
                 Quaternion clonedPortalRotation;
+                /*
                 if (smallestHitIndex == 0) { outPortalGravityDir = Vector2.left; clonedPortalRotation = Quaternion.Euler(0, 0, 90); }
                 else if (smallestHitIndex == 1) { outPortalGravityDir = Vector2.right; clonedPortalRotation = Quaternion.Euler(0, 0, -90); }
                 else if (smallestHitIndex == 2) { outPortalGravityDir = Vector2.down; clonedPortalRotation = Quaternion.Euler(0, 0, 180); }
@@ -89,6 +90,37 @@ public class PortalPlacementController : MonoBehaviour
                     isPortalPlacementActive = false;
                     activePortalCount = 0;
                 }
+                */
+                if (activePortalCount == 0)
+                {
+                    if (smallestHitIndex == 0) { outPortalGravityDir = Vector2.left; clonedPortalRotation = Quaternion.Euler(0, 0, 90); }
+                    else if (smallestHitIndex == 1) { outPortalGravityDir = Vector2.right; clonedPortalRotation = Quaternion.Euler(0, 0, -90); }
+                    else if (smallestHitIndex == 2) { outPortalGravityDir = Vector2.down; clonedPortalRotation = Quaternion.Euler(0, 0, 180); }
+                    else { outPortalGravityDir = Vector2.up; clonedPortalRotation = Quaternion.Euler(0, 0, 0); }
+                    outPortal = Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
+                    outPortal.name = "OutPortal";
+                    activePortalCount++;
+                }
+                else if (activePortalCount == 1 && (outPortal.transform.position - clonedPortalPosition).magnitude > minDistanceBetweenPortals)
+                {
+                    Vector2 inPortalGravityDir = new Vector2();
+                    if (smallestHitIndex == 0) { inPortalGravityDir = Vector2.left; clonedPortalRotation = Quaternion.Euler(0, 0, 90); }
+                    else if (smallestHitIndex == 1) { inPortalGravityDir = Vector2.right; clonedPortalRotation = Quaternion.Euler(0, 0, -90); }
+                    else if (smallestHitIndex == 2) { inPortalGravityDir = Vector2.down; clonedPortalRotation = Quaternion.Euler(0, 0, 180); }
+                    else { inPortalGravityDir = Vector2.up; clonedPortalRotation = Quaternion.Euler(0, 0, 0); }
+                    inPortalNormalInverse = inPortalGravityDir * -1;
+                    inPortal = Instantiate(portalPrefab, clonedPortalPosition, clonedPortalRotation);
+                    inPortal.name = "InPortal";
+                    activePortalCount++;
+                    characterAIMovementController = GameObject.FindGameObjectWithTag("Character").GetComponent<CharacterAIMovementController>();
+                    characterAIMovementController.destinationPos = inPortal.transform.position;
+                    characterAIMovementController.activatePathFinder = true;
+                    isPortalPlacementActive = false;
+                    activePortalCount = 0;
+                }
+
+
+
             }
         }
         if (numberOfPortalPairPlaced == allowedTotalPortalPair) { isPortalQuotaFinished = true; }
