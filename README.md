@@ -1,4 +1,4 @@
-# Game-Dev-Game-Off-2021-Source-Codes
+# Game-Off-2021-Source-Codes
 Source codes of the 'Another Portal Game?' developed for the Game Off 2021. <br />
 
 Created by Mehmet Bahadır Maktav on 11/12/21. <br />
